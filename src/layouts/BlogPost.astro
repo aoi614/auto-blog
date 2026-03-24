@@ -77,22 +77,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<h1>{title}</h1>
 						<hr />
 					</div>
+
 					<slot />
-				</div>
-				
-				{/* =========================================================
-				    💰 収益化・広告スペース（全記事の下に自動表示されます）
-				    ========================================================= */}
-				<div class="ad-space" style="margin-top: 3em; padding: 2em; background-color: #f8f9fa; border-radius: 8px; text-align: center; border: 2px dashed #ccc;">
-					<p style="color: #666; font-size: 0.9em; margin-bottom: 1em;">スポンサーリンク</p>
-					
-					{/* 
-						[ここにGoogle AdSenseのコードや、ASPアフィリエイトのバナーを貼り付けます] 
-						例：<a href="アフィリエイトリンク"><img src="バナー画像URL" alt="プログラミングスクール"></a>
-					*/}
-					<div style="padding: 2em; background-color: #eaeaea; color: #888;">
-						[ここに広告（AdSenseやアフィリエイト）が表示されます]
-					</div>
 				</div>
 			</article>
 		</main>
