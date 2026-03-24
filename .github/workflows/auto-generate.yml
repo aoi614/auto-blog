@@ -1,0 +1,50 @@
+name: Auto Generate Blog Post
+
+on:
+  schedule:
+    # Runs at 00:00 UTC (9:00 AM JST) every Monday. Change this to run more frequently if desired.
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+# Define permissions for the GITHUB_TOKEN so we can push code back to the repo
+permissions:
+  contents: write
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run AI Generation Script
+        env:
+          # This secret must be added in GitHub Repository Settings -> Secrets and variables -> Actions
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/generate-article.mjs
+        
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Add only the new blog posts generated
+          git add src/content/blog/
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No new articles generated to commit"
+          else
+            git commit -m "🤖 Auto-generated blog post via AI"
+            git push
+          fi
