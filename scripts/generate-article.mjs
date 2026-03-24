@@ -38,6 +38,9 @@ async function generateArticle() {
     
     Then write a well-structured article with an introduction, 3-4 main headings (H2), subheadings (H3), bullet points, and code snippets or examples if applicable.
     Make it engaging to read, optimized for SEO, and highly valuable for people interested in AI.
+    
+    IMPORTANT MUST-HAVE: At the very end of the article, add a compelling "Call To Action" (CTA) section under an H2 heading like "まとめ：今すぐ〇〇を試してみよう！".
+    In this CTA section, naturally encourage the reader to click the affiliate links below (e.g., "If you want to master AI tools, click the link below to start a 1-month free trial of this programming school", or "Check out the official site below to try it yourself").
   `;
 
   try {
