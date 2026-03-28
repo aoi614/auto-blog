@@ -6,6 +6,11 @@ on:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  # Allows automatic deployment right after the AI generation finishes
+  workflow_run:
+    workflows: ["Auto Generate Blog Post"]
+    types:
+      - completed
 
 # Allow this job to clone the repo and create a page deployment
 permissions:
