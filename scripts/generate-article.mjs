@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Parser from "rss-parser";
 import fs from "fs/promises";
 import path from "path";
 import dotenv from "dotenv";
@@ -21,10 +22,24 @@ async function generateArticle() {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+  // --- Fetch Latest AI News from Google News RSS ---
+  console.log("Fetching latest AI news from Google News RSS...");
+  const parser = new Parser();
+  // Fetch Japan Google News for AI topics
+  const query = encodeURIComponent('AI OR ChatGPT OR 生成AI');
+  const feed = await parser.parseURL(`https://news.google.com/rss/search?q=${query}&hl=ja&gl=JP&ceid=JP:ja`);
+  
+  // Extract top 10 most recent headlines
+  const topNews = feed.items.slice(0, 10).map((item, i) => `${i+1}. ${item.title} (${item.pubDate})`).join("\n");
+  console.log("📰 Today's Headlines Found:\n" + topNews);
+
   const prompt = `
     You are an expert AI researcher and tech blog writer specializing in Artificial Intelligence. 
-    Write a high-quality, engaging, and highly informative blog post introducing the "latest AI tools", "recent AI news", or "AI learning tips".
-    Choose ONE specific AI topic for this article (e.g., a new AI image generator, an update to ChatGPT/Claude, or how AI is changing a specific industry) to make it deep and interesting.
+    Below are the top 10 trending AI news headlines in Japan RIGHT NOW:
+    
+    ${topNews}
+    
+    CRITICAL INSTRUCTION: Choose exactly ONE of the most interesting, impactful headlines from the list above, and write a high-quality, engaging, and deeply informative news blog post about it. Do not just list the news; write a full article unpacking that single topic, adding your own simulated "expert insight" on why it matters.
     
     The output MUST be exactly in valid Markdown format suitable for an Astro framework blog.
     Do not wrap the whole response in a markdown code block (\`\`\`markdown \`\`\`). Starts immediately with the frontmatter.
