@@ -1,0 +1,155 @@
+---
+// Follow / Subscribe CTA — placed after share bar in blog posts
+---
+
+<section class="follow-cta" aria-label="フォロー・購読">
+	<div class="follow-cta-inner">
+		<div class="follow-cta-glow"></div>
+		<div class="follow-cta-content">
+			<span class="follow-cta-icon">📬</span>
+			<h3 class="follow-cta-heading">最新AI情報を見逃さない！</h3>
+			<p class="follow-cta-text">
+				AIトレンド速報は毎日最新のAIニュースをお届けしています。<br />
+				フォロー＆購読して、最新情報をいち早くキャッチしましょう。
+			</p>
+			<div class="follow-cta-buttons">
+				<a
+					href="https://x.com/"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="follow-btn follow-btn-x"
+				>
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+						<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+					</svg>
+					フォローする
+				</a>
+				<a
+					href="/rss.xml"
+					target="_blank"
+					class="follow-btn follow-btn-rss"
+				>
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+						<path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+					</svg>
+					RSS購読
+				</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.follow-cta {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 0 1.5rem 2rem;
+	}
+	.follow-cta-inner {
+		position: relative;
+		overflow: hidden;
+		border-radius: 16px;
+		background: linear-gradient(135deg, #0c1222 0%, #0f172a 50%, #1e293b 100%);
+		padding: 2.5rem 2rem;
+		text-align: center;
+	}
+	.follow-cta-glow {
+		position: absolute;
+		top: -40px;
+		right: -40px;
+		width: 200px;
+		height: 200px;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, transparent 70%);
+		pointer-events: none;
+	}
+	.follow-cta-content {
+		position: relative;
+		z-index: 1;
+	}
+	.follow-cta-icon {
+		font-size: 2.5rem;
+		display: block;
+		margin-bottom: 0.75rem;
+		animation: follow-bounce 2s ease-in-out infinite;
+	}
+	@keyframes follow-bounce {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-6px); }
+	}
+	.follow-cta-heading {
+		font-size: 1.3rem;
+		font-weight: 700;
+		color: #f1f5f9;
+		margin: 0 0 0.75rem;
+		line-height: 1.4;
+	}
+	.follow-cta-text {
+		font-size: 0.88rem;
+		color: #94a3b8;
+		line-height: 1.7;
+		margin: 0 0 1.5rem;
+		max-width: 480px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.follow-cta-buttons {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+	.follow-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.7em 1.5em;
+		border-radius: 10px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.25s ease;
+		color: white;
+	}
+	.follow-btn:hover {
+		transform: translateY(-2px);
+		color: white;
+	}
+	.follow-btn-x {
+		background: #0f1419;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+	}
+	.follow-btn-x:hover {
+		background: #1a1f25;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+	}
+	.follow-btn-rss {
+		background: linear-gradient(135deg, #0ea5e9, #0284c7);
+		box-shadow: 0 2px 12px rgba(14, 165, 233, 0.3);
+	}
+	.follow-btn-rss:hover {
+		box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+	}
+
+	@media (max-width: 720px) {
+		.follow-cta {
+			padding: 0 1rem 1.5rem;
+		}
+		.follow-cta-inner {
+			padding: 2rem 1.5rem;
+		}
+		.follow-cta-heading {
+			font-size: 1.15rem;
+		}
+		.follow-cta-buttons {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.follow-btn {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+</style>

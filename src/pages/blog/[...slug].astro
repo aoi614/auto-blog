@@ -12,9 +12,20 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+
+// Calculate reading time (~400 chars/min for Japanese, ~200 words/min for English)
+const bodyText = post.body || '';
+const charCount = bodyText.length;
+const readingTime = Math.max(1, Math.ceil(charCount / 400));
+
+// Get all posts for related articles (excluding current)
+const allPosts = (await getCollection('blog'))
+	.filter((p) => p.id !== post.id)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} slug={post.id} relatedPosts={allPosts} readingTime={readingTime} headings={headings}>
 	<Content />
 </BlogPost>

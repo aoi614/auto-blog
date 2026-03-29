@@ -1,0 +1,174 @@
+---
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface Props {
+	headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Only render if there are H2/H3 headings
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{tocHeadings.length >= 2 && (
+	<nav class="toc" aria-label="目次">
+		<details open>
+			<summary class="toc-title">
+				<span class="toc-icon">📑</span> 目次
+			</summary>
+			<ol class="toc-list">
+				{tocHeadings.map((heading) => (
+					<li class={`toc-item depth-${heading.depth}`}>
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					</li>
+				))}
+			</ol>
+		</details>
+	</nav>
+)}
+
+<style>
+	.toc {
+		max-width: 760px;
+		margin: 0 auto 2rem;
+		padding: 0 1.5rem;
+	}
+	.toc details {
+		background: linear-gradient(135deg, rgba(14, 165, 233, 0.03) 0%, rgba(56, 189, 248, 0.05) 100%);
+		border: 1px solid rgba(14, 165, 233, 0.12);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: box-shadow 0.3s ease;
+	}
+	.toc details:hover {
+		box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08);
+	}
+	.toc details[open] {
+		box-shadow: 0 2px 12px rgba(14, 165, 233, 0.06);
+	}
+	.toc-title {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		padding: 1rem 1.25rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: rgb(var(--gray-dark));
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s ease;
+	}
+	.toc-title::-webkit-details-marker {
+		display: none;
+	}
+	.toc-title::after {
+		content: '▼';
+		margin-left: auto;
+		font-size: 0.7rem;
+		color: var(--accent);
+		transition: transform 0.3s ease;
+	}
+	details:not([open]) .toc-title::after {
+		transform: rotate(-90deg);
+	}
+	.toc-title:hover {
+		background: rgba(14, 165, 233, 0.06);
+	}
+	.toc-icon {
+		font-size: 1.1em;
+	}
+
+	.toc-list {
+		margin: 0;
+		padding: 0 1.25rem 1rem;
+		list-style: none;
+		counter-reset: toc-counter;
+	}
+	.toc-item {
+		counter-increment: toc-counter;
+		margin: 0;
+		padding: 0;
+	}
+	.toc-item a {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6em;
+		padding: 0.45em 0.75em;
+		border-radius: 8px;
+		font-size: 0.88rem;
+		line-height: 1.5;
+		color: rgb(var(--gray-dark));
+		text-decoration: none;
+		transition: all 0.2s ease;
+		border-left: 2px solid transparent;
+	}
+	.toc-item a::before {
+		content: counter(toc-counter);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.5em;
+		height: 1.5em;
+		border-radius: 6px;
+		background: rgba(14, 165, 233, 0.08);
+		color: var(--accent);
+		font-size: 0.75rem;
+		font-weight: 700;
+		flex-shrink: 0;
+	}
+	.toc-item a:hover {
+		background: rgba(14, 165, 233, 0.06);
+		border-left-color: var(--accent);
+		color: var(--accent);
+	}
+
+	/* H3 indent */
+	.toc-item.depth-3 {
+		counter-increment: none;
+	}
+	.toc-item.depth-3 a {
+		padding-left: 2.5em;
+		font-size: 0.83rem;
+		color: rgb(var(--gray));
+	}
+	.toc-item.depth-3 a::before {
+		content: '–';
+		background: none;
+		color: rgb(var(--gray));
+		font-weight: 400;
+		min-width: 1em;
+	}
+	.toc-item.depth-3 a:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 720px) {
+		.toc {
+			padding: 0 1rem;
+		}
+	}
+</style>
+
+<script>
+	// Smooth scroll for TOC links
+	document.querySelectorAll('.toc-item a').forEach((link) => {
+		link.addEventListener('click', (e) => {
+			const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+			if (href && href.startsWith('#')) {
+				e.preventDefault();
+				const target = document.querySelector(href);
+				if (target) {
+					target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					// Update URL hash without jumping
+					history.pushState(null, '', href);
+				}
+			}
+		});
+	});
+</script>

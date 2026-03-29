@@ -2,22 +2,52 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import AdInsert from '../components/AdInsert.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import FollowCTA from '../components/FollowCTA.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+type Props = CollectionEntry<'blog'>['data'] & {
+	slug?: string;
+	relatedPosts?: CollectionEntry<'blog'>[];
+	readingTime?: number;
+	headings?: Heading[];
+};
+
+const { title, description, pubDate, updatedDate, heroImage, slug, relatedPosts = [], readingTime, headings = [] } = Astro.props;
 
 const pageUrl = Astro.url.href;
 const encodedUrl = encodeURIComponent(pageUrl);
 const encodedTitle = encodeURIComponent(title);
+
+// Breadcrumb items
+const breadcrumbItems = [
+	{ name: 'ホーム', url: '/' },
+	{ name: 'ブログ', url: '/blog/' },
+	{ name: title, url: Astro.url.pathname },
+];
 ---
 
 <html lang="ja">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead
+			title={title}
+			description={description}
+			image={heroImage}
+			pubDate={pubDate}
+			updatedDate={updatedDate}
+			type="article"
+			breadcrumbs={breadcrumbItems}
+		/>
 		<style>
 			/* ===== Article Hero ===== */
 			.article-hero {
@@ -47,6 +77,17 @@ const encodedTitle = encodeURIComponent(title);
 				font-size: 0.8rem;
 				color: rgba(148, 163, 184, 0.7);
 				font-style: italic;
+			}
+			.article-meta .reading-time {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.3em;
+				font-size: 0.8rem;
+				color: var(--accent-light);
+				background: rgba(14, 165, 233, 0.12);
+				padding: 0.2em 0.7em;
+				border-radius: 999px;
+				border: 1px solid rgba(14, 165, 233, 0.2);
 			}
 			.article-hero h1 {
 				font-size: 2rem;
@@ -140,7 +181,7 @@ const encodedTitle = encodeURIComponent(title);
 			.share-section {
 				max-width: 760px;
 				margin: 0 auto;
-				padding: 0 1.5rem 3rem;
+				padding: 0 1.5rem 2rem;
 			}
 			.share-bar {
 				display: flex;
@@ -184,6 +225,76 @@ const encodedTitle = encodeURIComponent(title);
 				background: #00a4de;
 			}
 
+			/* ===== Related Posts ===== */
+			.related-section {
+				max-width: 760px;
+				margin: 0 auto;
+				padding: 0 1.5rem 3rem;
+			}
+			.related-heading {
+				font-size: 1.2rem;
+				font-weight: 700;
+				color: rgb(var(--gray-dark));
+				margin: 0 0 1.25rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5em;
+			}
+			.related-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: 1rem;
+			}
+			.related-card {
+				background: var(--card-bg);
+				border-radius: 12px;
+				box-shadow: var(--card-shadow);
+				overflow: hidden;
+				text-decoration: none;
+				color: inherit;
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+				display: flex;
+				flex-direction: column;
+			}
+			.related-card:hover {
+				transform: translateY(-4px);
+				box-shadow: var(--card-shadow-hover);
+				color: inherit;
+			}
+			.related-card-image {
+				aspect-ratio: 16 / 9;
+				overflow: hidden;
+				background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-light) 100%);
+			}
+			.related-card-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 0;
+				margin: 0;
+			}
+			.related-card-body {
+				padding: 1rem;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+			.related-card-date {
+				font-size: 0.75rem;
+				color: rgb(var(--gray));
+				margin-bottom: 0.4rem;
+			}
+			.related-card-title {
+				font-size: 0.9rem;
+				font-weight: 600;
+				line-height: 1.5;
+				color: rgb(var(--gray-dark));
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
 			/* ===== Responsive ===== */
 			@media (max-width: 720px) {
 				.article-hero {
@@ -196,11 +307,17 @@ const encodedTitle = encodeURIComponent(title);
 					padding: 2rem 1rem;
 				}
 				.share-section {
-					padding: 0 1rem 2rem;
+					padding: 0 1rem 1.5rem;
 				}
 				.share-bar {
 					flex-direction: column;
 					align-items: flex-start;
+				}
+				.related-section {
+					padding: 0 1rem 2rem;
+				}
+				.related-grid {
+					grid-template-columns: 1fr;
 				}
 			}
 		</style>
@@ -210,8 +327,9 @@ const encodedTitle = encodeURIComponent(title);
 		<Header />
 		<main>
 			<article>
-				<!-- Article Hero -->
+				<!-- Breadcrumb -->
 				<div class="article-hero">
+					<Breadcrumb items={breadcrumbItems} />
 					<div class="article-hero-inner">
 						<div class="article-meta">
 							<span class="date">
@@ -220,6 +338,11 @@ const encodedTitle = encodeURIComponent(title);
 							{updatedDate && (
 								<span class="updated">
 									(更新: <FormattedDate date={updatedDate} />)
+								</span>
+							)}
+							{readingTime && (
+								<span class="reading-time">
+									📖 約{readingTime}分で読めます
 								</span>
 							)}
 						</div>
@@ -233,9 +356,22 @@ const encodedTitle = encodeURIComponent(title);
 				</div>
 				<div class="article-gradient-bar"></div>
 
+				<!-- Ad: Top of article -->
+				<div style="max-width: 760px; margin: 0 auto; padding: 0 1.5rem;">
+					<AdInsert />
+				</div>
+
+				<!-- Table of Contents -->
+				<TableOfContents headings={headings} />
+
 				<!-- Article Body -->
 				<div class="article-body prose">
 					<slot />
+				</div>
+
+				<!-- Ad: Bottom of article -->
+				<div style="max-width: 760px; margin: 0 auto; padding: 0 1.5rem;">
+					<AdInsert />
 				</div>
 
 				<!-- Share -->
@@ -262,6 +398,40 @@ const encodedTitle = encodeURIComponent(title);
 						</div>
 					</div>
 				</div>
+
+				<!-- Follow CTA -->
+				<FollowCTA />
+
+				<!-- Related Posts -->
+				{relatedPosts.length > 0 && (
+					<div class="related-section">
+						<h2 class="related-heading">📰 関連記事</h2>
+						<div class="related-grid">
+							{relatedPosts.map((post) => (
+								<a class="related-card" href={`/blog/${post.id}/`}>
+									{post.data.heroImage ? (
+										<div class="related-card-image">
+											<Image
+												width={400}
+												height={225}
+												src={post.data.heroImage}
+												alt=""
+											/>
+										</div>
+									) : (
+										<div class="related-card-image"></div>
+									)}
+									<div class="related-card-body">
+										<span class="related-card-date">
+											<FormattedDate date={post.data.pubDate} />
+										</span>
+										<span class="related-card-title">{post.data.title}</span>
+									</div>
+								</a>
+							))}
+						</div>
+					</div>
+				)}
 			</article>
 		</main>
 		<Footer />

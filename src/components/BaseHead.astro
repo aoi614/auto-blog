@@ -10,11 +10,68 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+	pubDate?: Date;
+	updatedDate?: Date;
+	type?: 'website' | 'article';
+	breadcrumbs?: { name: string; url: string }[];
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+const {
+	title,
+	description,
+	image = FallbackImage,
+	pubDate,
+	updatedDate,
+	type = 'website',
+	breadcrumbs,
+} = Astro.props;
+
+// Build structured data
+const structuredData: Record<string, any> = {
+	"@context": "https://schema.org",
+	"@type": type === 'article' ? "BlogPosting" : "WebSite",
+	"headline": title,
+	"description": description,
+	"image": new URL(image.src, Astro.url).toString(),
+	"url": canonicalURL.toString(),
+	"author": {
+		"@type": "Organization",
+		"name": "AIトレンド速報",
+		"url": Astro.site?.toString() || "https://ai-trend-news.com"
+	},
+	"publisher": {
+		"@type": "Organization",
+		"name": "AIトレンド速報",
+		"url": Astro.site?.toString() || "https://ai-trend-news.com",
+		"logo": {
+			"@type": "ImageObject",
+			"url": new URL("/favicon.svg", Astro.site || "https://ai-trend-news.com").toString()
+		}
+	}
+};
+
+if (pubDate) {
+	structuredData.datePublished = pubDate.toISOString();
+}
+if (updatedDate) {
+	structuredData.dateModified = updatedDate.toISOString();
+} else if (pubDate) {
+	structuredData.dateModified = pubDate.toISOString();
+}
+
+// Breadcrumb structured data
+const breadcrumbData = breadcrumbs ? {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": breadcrumbs.map((item, index) => ({
+		"@type": "ListItem",
+		"position": index + 1,
+		"name": item.name,
+		"item": new URL(item.url, Astro.site || "https://ai-trend-news.com").toString()
+	}))
+} : null;
 ---
 
 <!-- Global Metadata -->
@@ -49,11 +106,13 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:site_name" content="AIトレンド速報" />
+<meta property="og:locale" content="ja_JP" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -62,18 +121,15 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image.src, Astro.url)} />
 
+<!-- Article-specific meta -->
+{pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+{updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+
 <!-- SEO JSON-LD Structured Data -->
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": title,
-  "description": description,
-  "image": new URL(image.src, Astro.url).toString(),
-  "author": {
-    "@type": "Organization",
-    "name": "Auto-Blog AI"
-  }
-})} />
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+<!-- Breadcrumb JSON-LD -->
+{breadcrumbData && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />}
 
 <!-- Google tag (gtag.js) -->
 <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-L0YV5M9E9L"></script>

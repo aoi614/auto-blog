@@ -4,6 +4,8 @@ on:
   schedule:
     # Runs at 00:00 UTC (9:00 AM JST) EVERY DAY.
     - cron: '0 0 * * *'
+    # Runs at 12:00 UTC (9:00 PM JST) EVERY DAY — 2nd article of the day.
+    - cron: '0 12 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 # Define permissions for the GITHUB_TOKEN so we can push code back to the repo
@@ -52,3 +54,10 @@ jobs:
             git commit -m "🤖 Auto-generated blog post via AI"
             git push
           fi
+
+      - name: Request Google Indexing
+        if: success()
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/request-indexing.mjs
+        continue-on-error: true  # Don't fail the workflow if indexing fails

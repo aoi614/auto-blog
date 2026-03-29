@@ -1,0 +1,32 @@
+---
+/**
+ * AdInsert — Inline AdSense ad unit for article pages.
+ * Renders a responsive AdSense display ad.
+ * Place this component between content sections (e.g., after H2 headings).
+ */
+interface Props {
+	slot?: string;
+}
+---
+
+<div class="ad-container">
+	<ins class="adsbygoogle"
+		style="display:block"
+		data-ad-client="ca-pub-8204767432830277"
+		data-ad-slot="auto"
+		data-ad-format="auto"
+		data-full-width-responsive="true"></ins>
+</div>
+
+<style>
+	.ad-container {
+		margin: 2rem 0;
+		padding: 0.5rem 0;
+		min-height: 100px;
+		text-align: center;
+	}
+</style>
+
+<script is:inline>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+</script>

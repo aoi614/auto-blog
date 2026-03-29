@@ -1,0 +1,245 @@
+---
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const posts = (await getCollection('blog')).sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	);
+	return paginate(posts, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const pageTitle = page.currentPage === 1
+	? `ブログ一覧 | ${SITE_TITLE}`
+	: `ブログ一覧（${page.currentPage}ページ目） | ${SITE_TITLE}`;
+
+// Pre-compute pagination items to avoid complex ternary in template
+type PageItem = { type: 'current' | 'link' | 'ellipsis'; num: number; url: string };
+const pageItems: PageItem[] = [];
+for (let num = 1; num <= page.lastPage; num++) {
+	const url = num === 1 ? '/blog/' : `/blog/${num}/`;
+	if (num === page.currentPage) {
+		pageItems.push({ type: 'current', num, url });
+	} else if (num === 1 || num === page.lastPage || Math.abs(num - page.currentPage) <= 1) {
+		pageItems.push({ type: 'link', num, url });
+	} else if (num === page.currentPage - 2 || num === page.currentPage + 2) {
+		pageItems.push({ type: 'ellipsis', num, url });
+	}
+}
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={pageTitle} description="AIトレンド速報の全記事一覧です。最新のAIニュースやツール情報をまとめてお届けします。" />
+		<style>
+			/* ===== Blog Grid ===== */
+			.posts-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1.5rem;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.post-card {
+				background: var(--card-bg);
+				border-radius: var(--card-radius);
+				overflow: hidden;
+				box-shadow: var(--card-shadow);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+			.post-card:hover {
+				transform: translateY(-4px);
+				box-shadow: var(--card-shadow-hover);
+			}
+			.post-card a {
+				text-decoration: none;
+				display: block;
+			}
+			.post-card img {
+				width: 100%;
+				aspect-ratio: 1200 / 630;
+				object-fit: cover;
+				border-radius: 0;
+				margin: 0;
+			}
+			.post-card-body {
+				padding: 1.2rem 1.5rem 1.5rem;
+			}
+			.post-card-body .date {
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+				margin-bottom: 0.5rem;
+			}
+			.post-card-body h3 {
+				font-size: 1.05rem;
+				font-weight: 600;
+				line-height: 1.5;
+				color: rgb(var(--gray-dark));
+				margin: 0 0 0.5rem;
+				transition: color 0.2s;
+			}
+			.post-card-body .description {
+				font-size: 0.82rem;
+				color: rgb(var(--gray));
+				line-height: 1.6;
+				margin: 0;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+			.post-card a:hover h3 {
+				color: var(--accent);
+			}
+			.posts-count {
+				text-align: center;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+				margin-top: 2rem;
+			}
+
+			/* ===== Pagination ===== */
+			.pagination {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+				margin-top: 3rem;
+				flex-wrap: wrap;
+			}
+			.pagination a,
+			.pagination span {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2.5rem;
+				height: 2.5rem;
+				padding: 0 0.75rem;
+				border-radius: 10px;
+				font-size: 0.9rem;
+				font-weight: 500;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+			.pagination a {
+				background: var(--card-bg);
+				color: rgb(var(--gray-dark));
+				box-shadow: var(--card-shadow);
+			}
+			.pagination a:hover {
+				background: var(--accent);
+				color: white;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+			}
+			.pagination .current {
+				background: linear-gradient(135deg, #0ea5e9, #0284c7);
+				color: white;
+				font-weight: 700;
+				box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+			}
+			.pagination .disabled {
+				background: rgba(var(--gray-light), 0.5);
+				color: rgba(var(--gray), 0.4);
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.pagination .nav-label {
+				font-size: 0.85rem;
+			}
+			.pagination .ellipsis {
+				background: none;
+				box-shadow: none;
+				color: rgb(var(--gray));
+				min-width: auto;
+				padding: 0 0.25rem;
+			}
+
+			@media (max-width: 720px) {
+				.posts-grid {
+					grid-template-columns: 1fr;
+				}
+				.pagination {
+					gap: 0.35rem;
+				}
+				.pagination a,
+				.pagination span {
+					min-width: 2.2rem;
+					height: 2.2rem;
+					padding: 0 0.5rem;
+					font-size: 0.85rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+
+		<!-- Mini Hero -->
+		<section class="mini-hero">
+			<h1>📰 すべての記事</h1>
+			<p>{page.total}件の記事を公開中</p>
+			<div class="gradient-bar"></div>
+		</section>
+
+		<!-- Posts Grid -->
+		<div class="content-container">
+			<ul class="posts-grid">
+				{page.data.map((post) => (
+					<li class="post-card">
+						<a href={`/blog/${post.id}/`}>
+							{post.data.heroImage && (
+								<Image width={600} height={315} src={post.data.heroImage} alt={post.data.title} />
+							)}
+							<div class="post-card-body">
+								<p class="date">
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+								<h3>{post.data.title}</h3>
+								<p class="description">{post.data.description}</p>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
+
+			{/* Pagination */}
+			{page.lastPage > 1 && (
+				<nav class="pagination" aria-label="ページナビゲーション">
+					{page.url.prev ? (
+						<a href={page.url.prev} class="nav-label">← 前へ</a>
+					) : (
+						<span class="disabled nav-label">← 前へ</span>
+					)}
+
+					{pageItems.map((item) => (
+						item.type === 'current' ? (
+							<span class="current">{item.num}</span>
+						) : item.type === 'ellipsis' ? (
+							<span class="ellipsis">…</span>
+						) : (
+							<a href={item.url}>{item.num}</a>
+						)
+					))}
+
+					{page.url.next ? (
+						<a href={page.url.next} class="nav-label">次へ →</a>
+					) : (
+						<span class="disabled nav-label">次へ →</span>
+					)}
+				</nav>
+			)}
+		</div>
+
+		<Footer />
+	</body>
+</html>

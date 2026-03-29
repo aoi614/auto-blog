@@ -60,6 +60,26 @@ async function generateOgImage(title, slug, fontData, outputDir) {
   return outputPath;
 }
 
+// ===== Duplicate Prevention: Load existing article titles =====
+async function getExistingTitles() {
+  const blogDir = path.resolve(__dirname, "..", "src", "content", "blog");
+  try {
+    const files = await fs.readdir(blogDir);
+    const titles = [];
+    for (const file of files) {
+      if (!file.endsWith(".md") && !file.endsWith(".mdx")) continue;
+      const content = await fs.readFile(path.join(blogDir, file), "utf-8");
+      const titleMatch = content.match(/title:\s*["']([^"']+)["']/);
+      if (titleMatch) {
+        titles.push(titleMatch[1]);
+      }
+    }
+    return titles;
+  } catch {
+    return [];
+  }
+}
+
 // ===== Article Generation =====
 async function generateArticle() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -83,6 +103,14 @@ async function generateArticle() {
   const topNews = feed.items.slice(0, 10).map((item, i) => `${i+1}. ${item.title} (${item.pubDate})`).join("\n");
   console.log("📰 Today's Headlines Found:\n" + topNews);
 
+  // --- Load existing titles for duplicate prevention ---
+  const existingTitles = await getExistingTitles();
+  console.log(`📝 Existing articles: ${existingTitles.length} found`);
+
+  const duplicateGuard = existingTitles.length > 0
+    ? `\n\n### DUPLICATE PREVENTION (CRITICAL):\nThe following topics have ALREADY been written about on this blog. Do NOT choose the same or very similar topics:\n${existingTitles.map((t, i) => `- ${t}`).join("\n")}\n\nChoose a DIFFERENT, FRESH topic from the headlines above that is NOT covered by any of the existing articles.\n`
+    : "";
+
   const prompt = `
     You are an expert AI researcher and tech blog writer specializing in Artificial Intelligence. 
     Below are the top 10 trending AI news headlines in Japan RIGHT NOW:
@@ -90,17 +118,25 @@ async function generateArticle() {
     ${topNews}
     
     CRITICAL INSTRUCTION: Choose exactly ONE of the most interesting, impactful headlines from the list above, and write a high-quality, engaging, and deeply informative news blog post about it. Do not just list the news; write a full article unpacking that single topic, adding your own simulated "expert insight" on why it matters.
+    ${duplicateGuard}
     
     The output MUST be exactly in valid Markdown format suitable for an Astro framework blog.
     Do not wrap the whole response in a markdown code block (\`\`\`markdown \`\`\`). Starts immediately with the frontmatter.
     Include the following YAML frontmatter at the very top of the file:
     ---
     title: "[A Catchy, Clickable Title about the AI topic]"
-    description: "[A short 1-2 sentence compelling SEO description about the AI tool/news]"
+    description: "[A compelling SEO description in 120-160 characters. Include the main keyword naturally. Make it actionable and curiosity-inducing.]"
     pubDate: "YYYY-MM-DD"
     ---
     
-    Then write a well-structured article with an introduction, 3-4 main headings (H2), subheadings (H3), bullet points, and code snippets or examples if applicable.
+    ### ARTICLE STRUCTURE REQUIREMENTS:
+    1. **Opening hook** (2-3 sentences): Start with a compelling, attention-grabbing statement that makes the reader want to continue. NO generic introductions.
+    2. **4-5 main sections** with H2 headings: Each section should be substantial (300+ words).
+    3. **Sub-sections** with H3 headings where appropriate.
+    4. **Total article length**: Minimum 2000 characters in Japanese. Aim for thorough, in-depth coverage.
+    5. **Bullet points and lists** where they add clarity.
+    6. **Bold text** for key terms and emphasis (use naturally, not on every keyword).
+    7. End with a forward-looking perspective, NOT a generic summary.
     
     ### CRITICAL WRITING STYLE RULES (ANTI-AI DETECTION):
     1. WRITE LIKE A HUMAN TECH BLOGGER. Use a conversational, enthusiastic, and slightly informal tone in Japanese (Desu/Masu form, but natural).
@@ -108,6 +144,24 @@ async function generateArticle() {
     3. Include "personal opinions" or simulated hands-on experiences (e.g., "実際に触ってみて驚いたのは…", "個人的にはここが神機能だと思いました").
     4. Do not make the structure perfectly symmetric. Real humans write with varying paragraph lengths and use bolding (**) naturally for emphasis, not just on every keyword.
     5. Do not write a generic dictionary-style explanation. Write it as a "Hot News/Review" column.
+    6. Use varied sentence structures. Mix short punchy sentences with longer analytical ones.
+    7. Include specific numbers, dates, or data points when available to add credibility.
+    
+    ### SEO OPTIMIZATION:
+    1. The description should be 120-160 characters, containing the primary keyword naturally.
+    2. Use the primary keyword in the first paragraph and in at least 2 H2 headings.
+    3. Include related keywords and synonyms throughout the article naturally.
+    
+    ### CTA SECTION (MANDATORY):
+    At the very end of the article (after all main content), add a section with this exact format:
+    
+    ## 🔗 関連ツール・サービス
+    
+    List 2-4 AI tools or services that are directly relevant to the article topic. For each tool:
+    - Use this format: **[ツール名](公式URL)** — 一行説明（日本語で30-50文字）
+    - Only include tools that are ACTUALLY mentioned or directly related to the article
+    - Use real, correct official URLs (e.g., https://chat.openai.com/ for ChatGPT, https://claude.ai/ for Claude, https://gemini.google.com/ for Gemini)
+    - Do NOT make up fake URLs
     
     Make it highly readable, optimized for SEO, and extremely valuable.
   `;

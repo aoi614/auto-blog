@@ -227,8 +227,18 @@ const latestPosts = (await getCollection('blog'))
 				font-weight: 600;
 				line-height: 1.5;
 				color: rgb(var(--gray-dark));
-				margin: 0;
+				margin: 0 0 0.5rem;
 				transition: color 0.2s;
+			}
+			.post-card-body .description {
+				font-size: 0.82rem;
+				color: rgb(var(--gray));
+				line-height: 1.6;
+				margin: 0;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
 			}
 			.post-card a:hover h3 {
 				color: var(--accent);
@@ -316,6 +326,7 @@ const latestPosts = (await getCollection('blog'))
 									<FormattedDate date={post.data.pubDate} />
 								</p>
 								<h3>{post.data.title}</h3>
+								<p class="description">{post.data.description}</p>
 							</div>
 						</a>
 					</li>
