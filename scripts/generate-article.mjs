@@ -240,7 +240,7 @@ async function generateArticle() {
     const filename = `${slug}.md`;
 
     // --- Generate OG image for the new article ---
-    const ogDir = path.resolve(__dirname, "..", "src", "assets", "og");
+    const ogDir = path.resolve(__dirname, "..", "public", "og");
     await fs.mkdir(ogDir, { recursive: true });
 
     console.log("\n🎨 Generating OG image...");
@@ -251,7 +251,7 @@ async function generateArticle() {
     // Add heroImage to frontmatter
     text = text.replace(
       /^(---\n[\s\S]*?)(---)/,
-      (match, front, end) => front + `heroImage: "../../assets/og/${slug}.png"\n` + end
+      (match, front, end) => front + `heroImage: "/og/${slug}.png"\n` + end
     );
 
     // Define the output directory based on Astro's content collections
@@ -263,7 +263,7 @@ async function generateArticle() {
     // Write the Markdown file
     await fs.writeFile(filePath, text, "utf-8");
     console.log(`\n✅ Successfully created new article: ${filePath}`);
-    console.log(`🖼️  OG image: src/assets/og/${slug}.png`);
+    console.log(`🖼️  OG image: public/og/${slug}.png`);
     
   } catch (error) {
     console.error("Error generating article:", error);
