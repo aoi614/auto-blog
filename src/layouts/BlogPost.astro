@@ -11,7 +11,6 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import AuthorProfile from '../components/AuthorProfile.astro';
 import Giscus from '../components/Giscus.astro';
-import AffiliateCTA from '../components/AffiliateCTA.astro';
 
 interface Heading {
 	depth: number;
@@ -45,7 +44,7 @@ const breadcrumbItems = [
 		<BaseHead
 			title={title}
 			description={description}
-			image={heroImage}
+			image={`/og/${slug}.png`}
 			pubDate={pubDate}
 			updatedDate={updatedDate}
 			type="article"
@@ -483,9 +482,6 @@ const breadcrumbItems = [
 					</div>
 				</div>
 
-				<!-- Affiliate Books CTA -->
-				<AffiliateCTA />
-
 				<!-- Author Box -->
 				<AuthorProfile />
 
@@ -531,7 +527,7 @@ const breadcrumbItems = [
 
 		<!-- Progress Bar Script & Inline Ad Injector -->
 		<script>
-			document.addEventListener('DOMContentLoaded', () => {
+			document.addEventListener('astro:page-load', () => {
 				// 1. Reading Progress Bar
 				const progressBar = document.getElementById('reading-progress');
 				const updateProgress = () => {

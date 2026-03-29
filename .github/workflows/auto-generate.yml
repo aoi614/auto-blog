@@ -37,7 +37,9 @@ jobs:
         env:
           # This secret must be added in GitHub Repository Settings -> Secrets and variables -> Actions
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node scripts/generate-article.mjs
+        run: |
+          node scripts/generate-article.mjs
+          npm run generate-og
         
       - name: Commit and Push changes
         run: |
@@ -45,7 +47,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
           # Add new blog posts and their OG images
-          git add src/content/blog/ src/assets/og/
+          git add src/content/blog/ public/og/
           
           # Only commit if there are changes
           if git diff --staged --quiet; then

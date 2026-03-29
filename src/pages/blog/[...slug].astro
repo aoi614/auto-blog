@@ -20,9 +20,16 @@ const charCount = bodyText.length;
 const readingTime = Math.max(1, Math.ceil(charCount / 400));
 
 // Get all posts for related articles (excluding current)
+const currentTags = post.data.tags || [];
 const allPosts = (await getCollection('blog'))
 	.filter((p) => p.id !== post.id)
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.map((p) => {
+		const postTags = p.data.tags || [];
+		const matchCount = postTags.filter(tag => currentTags.includes(tag)).length;
+		return { post: p, matchCount };
+	})
+	.sort((a, b) => b.matchCount - a.matchCount || b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf())
+	.map((p) => p.post)
 	.slice(0, 3);
 ---
 

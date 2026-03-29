@@ -196,7 +196,7 @@ async function main() {
   console.log("  ✅ Font loaded\n");
 
   // Ensure output directory exists
-  const outputDir = path.resolve(__dirname, "..", "src", "assets", "og");
+  const outputDir = path.resolve(__dirname, "..", "public", "og");
   await fs.mkdir(outputDir, { recursive: true });
 
   // Read all blog posts
