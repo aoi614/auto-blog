@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import AdUnit from '../components/AdUnit.astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
@@ -9,79 +10,492 @@ import Header from '../components/Header.astro';
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// Build share URLs
+const pageUrl = Astro.url.href;
+const encodedUrl = encodeURIComponent(pageUrl);
+const encodedTitle = encodeURIComponent(title);
 ---
 
 <html lang="ja">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead title={title} description={description} image={heroImage} pubDate={pubDate} />
 		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
+			/* ===== Article Header ===== */
+			.article-header {
+				background: linear-gradient(135deg, #0c1222 0%, #0f172a 40%, #1e293b 100%);
+				position: relative;
+				overflow: hidden;
+			}
+			.article-header::before {
+				content: '';
+				position: absolute;
+				top: -100px;
+				right: -60px;
+				width: 350px;
+				height: 350px;
+				border-radius: 50%;
+				background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%);
+				pointer-events: none;
+			}
+			.header-content {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 2.5rem 1.5rem 2rem;
+				position: relative;
+				z-index: 1;
+			}
+			.breadcrumb {
+				font-size: 0.8rem;
+				margin-bottom: 1.2rem;
+			}
+			.breadcrumb a {
+				color: #64748b;
+				text-decoration: none;
+				transition: color 0.2s;
+			}
+			.breadcrumb a:hover {
+				color: #94a3b8;
+			}
+			.breadcrumb span {
+				color: #475569;
+				margin: 0 0.4em;
+			}
+			.breadcrumb .current {
+				color: #94a3b8;
+			}
+			.article-date {
+				color: #64748b;
+				font-size: 0.85rem;
+				margin-bottom: 0.8rem;
+			}
+			.article-date .updated {
+				font-style: italic;
+				margin-left: 0.5em;
+				color: #94a3b8;
+			}
+			.article-header h1 {
+				font-size: 2rem;
+				font-weight: 700;
+				color: #f1f5f9;
+				line-height: 1.5;
+				margin: 0 0 1rem;
+			}
+			.article-description {
+				color: #94a3b8;
+				font-size: 0.95rem;
+				line-height: 1.7;
 				margin: 0;
 			}
+			.header-accent {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 4px;
+				background: linear-gradient(90deg, #0ea5e9, #38bdf8, #0ea5e9);
+			}
+
+			/* ===== Hero Image ===== */
 			.hero-image {
-				width: 100%;
+				max-width: 800px;
+				margin: -1rem auto 0;
+				padding: 0 1.5rem;
+				position: relative;
+				z-index: 2;
 			}
 			.hero-image img {
 				display: block;
+				width: 100%;
+				border-radius: 16px;
+				box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+				margin: 0;
+			}
+
+			/* ===== Article Content ===== */
+			.article-body {
+				display: grid;
+				grid-template-columns: 1fr 200px;
+				gap: 3rem;
+				max-width: 1060px;
 				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				padding: 2.5rem 1.5rem 3rem;
+				align-items: start;
 			}
 			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
+				width: 100%;
+				max-width: 100%;
+				margin: 0;
+				padding: 0;
+				color: rgb(var(--gray-dark));
+				font-size: 1rem;
+				line-height: 1.85;
+			}
+			.prose :global(h2) {
+				font-size: 1.5rem;
+				font-weight: 700;
+				margin: 2.5rem 0 1rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 2px solid rgb(var(--gray-light));
+				color: rgb(var(--black));
+			}
+			.prose :global(h3) {
+				font-size: 1.2rem;
+				font-weight: 600;
+				margin: 2rem 0 0.8rem;
+				color: rgb(var(--black));
+			}
+			.prose :global(p) {
+				margin-bottom: 1.5em;
+			}
+			.prose :global(ul), .prose :global(ol) {
+				margin-bottom: 1.5em;
+				padding-left: 1.5em;
+			}
+			.prose :global(li) {
+				margin-bottom: 0.5em;
+			}
+			.prose :global(blockquote) {
+				border-left: 4px solid var(--accent);
+				padding: 0.8em 1.2em;
+				margin: 1.5em 0;
+				background: rgba(14, 165, 233, 0.05);
+				border-radius: 0 8px 8px 0;
+			}
+			.prose :global(pre) {
+				border-radius: 12px;
+				margin: 1.5em 0;
+			}
+			.prose :global(img) {
+				border-radius: 12px;
+				box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+			}
+
+			/* ===== Sidebar TOC ===== */
+			.sidebar {
+				position: sticky;
+				top: 2rem;
+			}
+			.toc {
+				background: white;
+				border-radius: 12px;
+				padding: 1.2rem;
+				box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+				border: 1px solid rgb(var(--gray-light));
+			}
+			.toc-title {
+				font-size: 0.8rem;
+				font-weight: 700;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin: 0 0 0.8rem;
+				display: flex;
+				align-items: center;
+				gap: 0.4em;
+			}
+			.toc-list {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.toc-list li {
+				margin-bottom: 0.4rem;
+			}
+			.toc-list a {
+				font-size: 0.78rem;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				line-height: 1.5;
+				display: block;
+				padding: 0.2em 0;
+				transition: color 0.2s;
+				border-left: 2px solid transparent;
+				padding-left: 0.6em;
+			}
+			.toc-list a:hover,
+			.toc-list a.active {
+				color: var(--accent);
+				border-left-color: var(--accent);
+			}
+
+			/* ===== Share Bar ===== */
+			.share-bar {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 0 1.5rem 2rem;
+			}
+			.share-inner {
+				background: white;
+				border-radius: 16px;
+				padding: 1.5rem 2rem;
+				box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+			.share-label {
+				font-size: 0.85rem;
+				font-weight: 600;
+				color: rgb(var(--gray-dark));
+				white-space: nowrap;
+			}
+			.share-buttons {
+				display: flex;
+				gap: 0.6rem;
+			}
+			.share-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.4em;
+				padding: 0.5em 1.2em;
+				border-radius: 8px;
+				font-size: 0.8rem;
+				font-weight: 500;
+				text-decoration: none;
+				transition: all 0.2s ease;
+				border: none;
+				cursor: pointer;
+			}
+			.share-btn.x {
+				background: #0f1419;
+				color: white;
+			}
+			.share-btn.x:hover {
+				background: #1d9bf0;
+				transform: translateY(-1px);
+			}
+			.share-btn.hatena {
+				background: #00a4de;
+				color: white;
+			}
+			.share-btn.hatena:hover {
+				background: #008ec4;
+				transform: translateY(-1px);
+			}
+			.share-btn.line {
+				background: #06c755;
+				color: white;
+			}
+			.share-btn.line:hover {
+				background: #05b64c;
+				transform: translateY(-1px);
+			}
+			.share-btn.copy {
+				background: rgb(var(--gray-light));
 				color: rgb(var(--gray-dark));
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
+			.share-btn.copy:hover {
+				background: rgb(var(--gray));
+				color: white;
+				transform: translateY(-1px);
 			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
+
+			/* ===== Back link ===== */
+			.back-link {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 0 1.5rem 3rem;
 			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+			.back-link a {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4em;
+				color: var(--accent);
+				text-decoration: none;
+				font-size: 0.9rem;
+				font-weight: 500;
+				transition: color 0.2s;
 			}
-			.last-updated-on {
-				font-style: italic;
+			.back-link a:hover {
+				color: var(--accent-dark);
+			}
+
+			/* ===== Responsive ===== */
+			@media (max-width: 960px) {
+				.article-body {
+					grid-template-columns: 1fr;
+				}
+				.sidebar {
+					display: none;
+				}
+			}
+			@media (max-width: 768px) {
+				.header-content {
+					padding: 2rem 1rem 1.5rem;
+				}
+				.article-header h1 {
+					font-size: 1.5rem;
+				}
+				.hero-image {
+					padding: 0 1rem;
+				}
+				.article-body {
+					padding: 2rem 1rem;
+				}
+				.share-inner {
+					flex-direction: column;
+					align-items: flex-start;
+				}
 			}
 		</style>
 	</head>
 
 	<body>
 		<Header />
-		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										最終更新日: <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
-					</div>
 
-					<slot />
+		<!-- Article Header -->
+		<div class="article-header">
+			<div class="header-content">
+				<nav class="breadcrumb">
+					<a href="/">ホーム</a>
+					<span>›</span>
+					<a href="/blog">記事一覧</a>
+					<span>›</span>
+					<span class="current">記事</span>
+				</nav>
+				<div class="article-date">
+					<FormattedDate date={pubDate} />
+					{updatedDate && (
+						<span class="updated">
+							（更新: <FormattedDate date={updatedDate} />）
+						</span>
+					)}
 				</div>
-			</article>
+				<h1>{title}</h1>
+				{description && <p class="article-description">{description}</p>}
+			</div>
+			<div class="header-accent"></div>
+		</div>
+
+		<main>
+			<!-- Hero Image -->
+			{heroImage && (
+				<div class="hero-image">
+					<Image width={1020} height={535} src={heroImage} alt="" />
+				</div>
+			)}
+
+			<!-- Ad: Below Hero -->
+			<div style="max-width: 800px; margin: 1rem auto; padding: 0 1.5rem;">
+				<AdUnit format="horizontal" />
+			</div>
+
+			<!-- Article Content + Sidebar -->
+			<div class="article-body">
+				<article class="prose" id="article-content">
+					<slot />
+				</article>
+
+				<aside class="sidebar">
+					<div class="toc">
+						<p class="toc-title">📋 目次</p>
+						<ul class="toc-list" id="toc-list">
+							<!-- Populated by JS -->
+						</ul>
+					</div>
+				</aside>
+			</div>
+
+			<!-- Ad: After Article -->
+			<div style="max-width: 800px; margin: 0 auto; padding: 0 1.5rem;">
+				<AdUnit format="auto" />
+			</div>
+
+			<!-- Share Bar -->
+			<div class="share-bar">
+				<div class="share-inner">
+					<span class="share-label">この記事をシェア:</span>
+					<div class="share-buttons">
+						<a class="share-btn x" href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`} target="_blank" rel="noopener noreferrer">
+							𝕏 ポスト
+						</a>
+						<a class="share-btn hatena" href={`https://b.hatena.ne.jp/entry/s/${pageUrl.replace('https://', '')}`} target="_blank" rel="noopener noreferrer">
+							B! はてブ
+						</a>
+						<a class="share-btn line" href={`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`} target="_blank" rel="noopener noreferrer">
+							LINE
+						</a>
+						<button class="share-btn copy" id="copy-url-btn" data-url={pageUrl}>
+							📋 URLコピー
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Back Link -->
+			<div class="back-link">
+				<a href="/blog">← 記事一覧に戻る</a>
+			</div>
 		</main>
+
 		<Footer />
+
+		<script>
+			// Generate TOC from article headings
+			function buildTOC() {
+				const article = document.getElementById('article-content');
+				const tocList = document.getElementById('toc-list');
+				if (!article || !tocList) return;
+
+				const headings = article.querySelectorAll('h2, h3');
+				headings.forEach((heading, index) => {
+					const id = `heading-${index}`;
+					heading.id = id;
+
+					const li = document.createElement('li');
+					const a = document.createElement('a');
+					a.href = `#${id}`;
+					a.textContent = heading.textContent || '';
+					if (heading.tagName === 'H3') {
+						a.style.paddingLeft = '1.2em';
+						a.style.fontSize = '0.72rem';
+					}
+					li.appendChild(a);
+					tocList.appendChild(li);
+				});
+
+				// Scroll spy for active state
+				const tocLinks = tocList.querySelectorAll('a');
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							tocLinks.forEach(link => link.classList.remove('active'));
+							const activeLink = tocList.querySelector(`a[href="#${entry.target.id}"]`);
+							if (activeLink) activeLink.classList.add('active');
+						}
+					});
+				}, { rootMargin: '-20% 0px -70% 0px' });
+
+				headings.forEach(heading => observer.observe(heading));
+			}
+
+			// Copy URL button
+			function setupCopyButton() {
+				const btn = document.getElementById('copy-url-btn');
+				if (!btn) return;
+				btn.addEventListener('click', async () => {
+					const url = btn.getAttribute('data-url') || window.location.href;
+					try {
+						await navigator.clipboard.writeText(url);
+						const original = btn.innerHTML;
+						btn.innerHTML = '✅ コピー完了！';
+						setTimeout(() => { btn.innerHTML = original; }, 2000);
+					} catch {
+						// Fallback
+						const input = document.createElement('input');
+						input.value = url;
+						document.body.appendChild(input);
+						input.select();
+						document.execCommand('copy');
+						document.body.removeChild(input);
+					}
+				});
+			}
+
+			buildTOC();
+			setupCopyButton();
+		</script>
 	</body>
 </html>
