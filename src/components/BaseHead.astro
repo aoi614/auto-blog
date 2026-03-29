@@ -10,12 +10,11 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
-	pubDate?: Date;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage, pubDate } = Astro.props;
+const { title, description, image = FallbackImage } = Astro.props;
 ---
 
 <!-- Global Metadata -->
@@ -64,38 +63,17 @@ const { title, description, image = FallbackImage, pubDate } = Astro.props;
 <meta property="twitter:image" content={new URL(image.src, Astro.url)} />
 
 <!-- SEO JSON-LD Structured Data -->
-{pubDate ? (
-	<script type="application/ld+json" set:html={JSON.stringify({
-		"@context": "https://schema.org",
-		"@type": "BlogPosting",
-		"headline": title,
-		"description": description,
-		"image": new URL(image.src, Astro.url).toString(),
-		"datePublished": pubDate.toISOString(),
-		"url": canonicalURL.toString(),
-		"author": {
-			"@type": "Organization",
-			"name": "AIトレンド速報"
-		},
-		"publisher": {
-			"@type": "Organization",
-			"name": "AIトレンド速報",
-			"url": Astro.site?.toString()
-		},
-		"mainEntityOfPage": {
-			"@type": "WebPage",
-			"@id": canonicalURL.toString()
-		}
-	})} />
-) : (
-	<script type="application/ld+json" set:html={JSON.stringify({
-		"@context": "https://schema.org",
-		"@type": "WebSite",
-		"name": SITE_TITLE,
-		"description": description,
-		"url": Astro.site?.toString()
-	})} />
-)}
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": new URL(image.src, Astro.url).toString(),
+  "author": {
+    "@type": "Organization",
+    "name": "Auto-Blog AI"
+  }
+})} />
 
 <!-- Google tag (gtag.js) -->
 <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-L0YV5M9E9L"></script>

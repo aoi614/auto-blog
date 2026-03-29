@@ -1,15 +1,90 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
 ---
 
-<Layout
-	title="お問い合わせ"
-	description="当サイトへのお問い合わせ"
-	pubDate={new Date('2026-03-25')}
->
-	<p>当サイトに関するお問い合わせ、ご意見、ご感想は以下のGoogleフォームよりお知らせください。</p>
-	<p>
-		<a href="https://docs.google.com/forms/d/e/1FAIpQLSdLfTL17EHAlExQ02q0qUFNp78dWKz3w-_2XiR13CJOt8_bkg/viewform" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:10px 20px; background-color:#333; color:white; text-decoration:none; border-radius:5px;">お問い合わせフォーム（専用ページが開きます）</a>
-	</p>
-	<p>※お問い合わせの内容によっては、お返事にお時間をいただく場合や、お返事できない場合がございます。あらかじめご了承ください。</p>
-</Layout>
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`お問い合わせ | ${SITE_TITLE}`} description="AIトレンド速報へのお問い合わせページです。" />
+		<style>
+			.contact-content {
+				max-width: 640px;
+				margin: 0 auto;
+				padding: 3rem 1.5rem;
+				text-align: center;
+			}
+			.contact-card {
+				background: var(--card-bg);
+				border-radius: var(--card-radius);
+				box-shadow: var(--card-shadow);
+				padding: 3rem 2.5rem;
+			}
+			.contact-icon {
+				font-size: 3rem;
+				margin-bottom: 1rem;
+			}
+			.contact-card h2 {
+				font-size: 1.4rem;
+				font-weight: 700;
+				color: rgb(var(--gray-dark));
+				margin-bottom: 1rem;
+			}
+			.contact-card p {
+				font-size: 0.95rem;
+				color: rgb(var(--gray));
+				line-height: 1.8;
+				margin-bottom: 1.5rem;
+			}
+			.contact-note {
+				font-size: 0.8rem !important;
+				color: rgba(var(--gray), 0.7) !important;
+				margin-top: 1.5rem !important;
+				padding-top: 1.5rem;
+				border-top: 1px solid rgb(var(--gray-light));
+			}
+
+			@media (max-width: 720px) {
+				.contact-content {
+					padding: 2rem 1rem;
+				}
+				.contact-card {
+					padding: 2rem 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+
+		<!-- Mini Hero -->
+		<section class="mini-hero">
+			<h1>✉️ お問い合わせ</h1>
+			<p>ご意見・ご感想をお待ちしています</p>
+			<div class="gradient-bar"></div>
+		</section>
+
+		<div class="contact-content">
+			<div class="contact-card">
+				<div class="contact-icon">💬</div>
+				<h2>お気軽にご連絡ください</h2>
+				<p>当サイトに関するお問い合わせ、ご意見、ご感想は以下のGoogleフォームよりお知らせください。</p>
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSdLfTL17EHAlExQ02q0qUFNp78dWKz3w-_2XiR13CJOt8_bkg/viewform"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="cta-button"
+				>
+					お問い合わせフォームを開く →
+				</a>
+				<p class="contact-note">
+					※お問い合わせの内容によっては、お返事にお時間をいただく場合や、お返事できない場合がございます。あらかじめご了承ください。
+				</p>
+			</div>
+		</div>
+
+		<Footer />
+	</body>
+</html>

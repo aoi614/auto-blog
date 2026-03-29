@@ -1,21 +1,116 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
 ---
 
-<Layout
-	title="プライバシーポリシー"
-	description="当サイトのプライバシーポリシー"
-	pubDate={new Date('2026-03-25')}
->
-	<h2>1. 個人情報の利用目的</h2>
-	<p>当サイトでは、お問い合わせの際に名前やメールアドレス等の個人情報をご入力いただく場合がございます。<br>取得した個人情報は、お問い合わせに対する回答や必要な情報を電子メールなどでご連絡する場合に利用させていただくものであり、これらの目的以外では利用いたしません。</p>
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`プライバシーポリシー | ${SITE_TITLE}`} description="AIトレンド速報のプライバシーポリシーについて。" />
+		<style>
+			.policy-content {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 3rem 1.5rem;
+			}
+			.policy-section {
+				background: var(--card-bg);
+				border-radius: var(--card-radius);
+				box-shadow: var(--card-shadow);
+				padding: 2rem 2.5rem;
+				margin-bottom: 1.5rem;
+			}
+			.policy-section h2 {
+				font-size: 1.2rem;
+				font-weight: 700;
+				color: rgb(var(--gray-dark));
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.policy-section h2 .num {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				background: linear-gradient(135deg, #0ea5e9, #0284c7);
+				color: white;
+				font-size: 0.8rem;
+				font-weight: 700;
+				flex-shrink: 0;
+			}
+			.policy-section p {
+				font-size: 0.92rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.9;
+				margin: 0;
+			}
+			.policy-section a {
+				color: var(--accent);
+			}
+			.policy-section a:hover {
+				color: var(--accent-dark);
+			}
 
-	<h2>2. 広告について</h2>
-	<p>当サイトは、Google等の第三者配信の広告サービス（Google AdSense等）を利用しており、第三者配信事業者や広告ネットワークの配信する広告が掲載されます。<br>この広告配信にはCookieを使用し、当プラットフォームを含めた過去のアクセス情報に基づいて広告を配信します。GoogleによるCookieの利用は、<a href="https://policies.google.com/technologies/ads?gl=jp" target="_blank" rel="noopener noreferrer">Googleの広告およびコンテンツネットワークに関するポリシー</a>から無効にすることができます。</p>
+			@media (max-width: 720px) {
+				.policy-content {
+					padding: 2rem 1rem;
+				}
+				.policy-section {
+					padding: 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
 
-	<h2>3. アクセス解析ツールについて</h2>
-	<p>当サイトでは、Googleによるアクセス解析ツール「Googleアナリティクス」を利用しています。<br>このGoogleアナリティクスはトラフィックデータの収集のためにCookieを使用しています。トラフィックデータは匿名で収集されており、個人を特定するものではありません。</p>
+		<!-- Mini Hero -->
+		<section class="mini-hero">
+			<h1>🔒 プライバシーポリシー</h1>
+			<p>個人情報の取り扱いについて</p>
+			<div class="gradient-bar"></div>
+		</section>
 
-	<h2>4. 免責事項</h2>
-	<p>当サイトからのリンクやバナーなどで移動したサイトで提供される情報、サービス等について一切の責任を負いません。<br>また当サイトのコンテンツや情報について、できる限り正確な情報を提供するように務めておりますが、人工知能ツールによる自動生成を用いたコンテンツも含まれるため、情報が古くなっている場合や誤りが含まれる可能性もあります。当サイトに掲載された内容によって生じた損害等の一切の責任を負いかねますのでご了承ください。</p>
-</Layout>
+		<div class="policy-content">
+			<div class="policy-section">
+				<h2><span class="num">1</span> 個人情報の利用目的</h2>
+				<p>
+					当サイトでは、お問い合わせの際に名前やメールアドレス等の個人情報をご入力いただく場合がございます。<br>
+					取得した個人情報は、お問い合わせに対する回答や必要な情報を電子メールなどでご連絡する場合に利用させていただくものであり、これらの目的以外では利用いたしません。
+				</p>
+			</div>
+
+			<div class="policy-section">
+				<h2><span class="num">2</span> 広告について</h2>
+				<p>
+					当サイトは、Google等の第三者配信の広告サービス（Google AdSense等）を利用しており、第三者配信事業者や広告ネットワークの配信する広告が掲載されます。<br>
+					この広告配信にはCookieを使用し、当プラットフォームを含めた過去のアクセス情報に基づいて広告を配信します。GoogleによるCookieの利用は、<a href="https://policies.google.com/technologies/ads?gl=jp" target="_blank" rel="noopener noreferrer">Googleの広告およびコンテンツネットワークに関するポリシー</a>から無効にすることができます。
+				</p>
+			</div>
+
+			<div class="policy-section">
+				<h2><span class="num">3</span> アクセス解析ツールについて</h2>
+				<p>
+					当サイトでは、Googleによるアクセス解析ツール「Googleアナリティクス」を利用しています。<br>
+					このGoogleアナリティクスはトラフィックデータの収集のためにCookieを使用しています。トラフィックデータは匿名で収集されており、個人を特定するものではありません。
+				</p>
+			</div>
+
+			<div class="policy-section">
+				<h2><span class="num">4</span> 免責事項</h2>
+				<p>
+					当サイトからのリンクやバナーなどで移動したサイトで提供される情報、サービス等について一切の責任を負いません。<br>
+					また当サイトのコンテンツや情報について、できる限り正確な情報を提供するように務めておりますが、人工知能ツールによる自動生成を用いたコンテンツも含まれるため、情報が古くなっている場合や誤りが含まれる可能性もあります。当サイトに掲載された内容によって生じた損害等の一切の責任を負いかねますのでご了承ください。
+				</p>
+			</div>
+		</div>
+
+		<Footer />
+	</body>
+</html>

@@ -3,54 +3,134 @@ const today = new Date();
 ---
 
 <footer>
-	&copy; {today.getFullYear()} AI Trend News. All rights reserved.
-	<div class="footer-links">
-		<a href="/privacy-policy">プライバシーポリシー</a>
-		<span>|</span>
-		<a href="/contact">お問い合わせ</a>
-	</div>
-	<div class="social-links">
-		<a href="/rss.xml" target="_blank" aria-label="RSSフィード">
-			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
-				><path
-					fill="currentColor"
-					d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm1.5 12a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.5-.5a5.5 5.5 0 0 0-5.5-5.5.5.5 0 0 1 0-1 6.5 6.5 0 0 1 6.5 6.5.5.5 0 0 1-1 0zm4 0a9.5 9.5 0 0 0-9.5-9.5.5.5 0 0 1 0-1 10.5 10.5 0 0 1 10.5 10.5.5.5 0 0 1-1 0z"
-				></path></svg
-			>
-		</a>
+	<div class="footer-inner">
+		<div class="footer-grid">
+			<div class="footer-brand">
+				<div class="footer-logo">
+					<span class="footer-logo-icon">📡</span>
+					<span class="footer-logo-text">AIトレンド速報</span>
+				</div>
+				<p class="footer-tagline">AIの最新トレンドを毎日わかりやすくお届け。</p>
+			</div>
+			<div class="footer-nav">
+				<h4>コンテンツ</h4>
+				<ul>
+					<li><a href="/">ホーム</a></li>
+					<li><a href="/blog">すべての記事</a></li>
+					<li><a href="/about">サイトについて</a></li>
+				</ul>
+			</div>
+			<div class="footer-nav">
+				<h4>リンク</h4>
+				<ul>
+					<li><a href="/contact">お問い合わせ</a></li>
+					<li><a href="/privacy-policy">プライバシーポリシー</a></li>
+					<li><a href="/rss.xml" target="_blank">RSS</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="footer-gradient-bar"></div>
+		<div class="footer-bottom">
+			<p>&copy; {today.getFullYear()} AI Trend News. All rights reserved.</p>
+		</div>
 	</div>
 </footer>
 <style>
 	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
+		background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-mid) 100%);
+		color: var(--dark-text-muted);
+		padding: 0;
+		margin-top: 2rem;
+	}
+	.footer-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 3rem 1.5rem 1.5rem;
+	}
+	.footer-grid {
+		display: grid;
+		grid-template-columns: 2fr 1fr 1fr;
+		gap: 2rem;
+		margin-bottom: 2rem;
+	}
+
+	/* Brand */
+	.footer-logo {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+	}
+	.footer-logo-icon {
+		font-size: 1.3rem;
+	}
+	.footer-logo-text {
+		font-size: 1.1rem;
+		font-weight: 700;
+		background: linear-gradient(90deg, #f1f5f9, #38bdf8);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+	.footer-tagline {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--dark-text-muted);
+		margin: 0;
+	}
+
+	/* Nav */
+	.footer-nav h4 {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--dark-text);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.75rem;
+	}
+	.footer-nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.footer-nav a {
+		color: var(--dark-text-muted);
+		text-decoration: none;
+		font-size: 0.9rem;
+		transition: color 0.2s;
+	}
+	.footer-nav a:hover {
+		color: var(--accent-light);
+	}
+
+	/* Gradient bar */
+	.footer-gradient-bar {
+		height: 1px;
+		background: linear-gradient(90deg, transparent, rgba(14,165,233,0.4), transparent);
+		margin-bottom: 1.5rem;
+	}
+
+	/* Bottom */
+	.footer-bottom {
 		text-align: center;
 	}
-	.footer-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
+	.footer-bottom p {
+		font-size: 0.8rem;
+		color: rgba(148, 163, 184, 0.6);
+		margin: 0;
 	}
-	.footer-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-	}
-	.footer-links a:hover {
-		color: rgb(var(--gray-dark));
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+
+	@media (max-width: 720px) {
+		.footer-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+			text-align: center;
+		}
+		.footer-logo {
+			justify-content: center;
+		}
 	}
 </style>

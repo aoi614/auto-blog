@@ -5,169 +5,37 @@ import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { SITE_TITLE } from '../../consts';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-
-const featuredPost = posts[0];
-const remainingPosts = posts.slice(1);
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={`記事一覧 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<BaseHead title={`ブログ一覧 | ${SITE_TITLE}`} description="AIトレンド速報の全記事一覧です。最新のAIニュースやツール情報をまとめてお届けします。" />
 		<style>
-			/* ===== Page Header ===== */
-			.page-header {
-				background: linear-gradient(135deg, #0c1222 0%, #0f172a 40%, #1e293b 100%);
-				padding: 3rem 2rem 2.5rem;
-				text-align: center;
-				position: relative;
-				overflow: hidden;
-			}
-			.page-header::before {
-				content: '';
-				position: absolute;
-				top: -80px;
-				right: -60px;
-				width: 300px;
-				height: 300px;
-				border-radius: 50%;
-				background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%);
-				pointer-events: none;
-			}
-			.page-header h1 {
-				font-size: 2rem;
-				font-weight: 700;
-				color: #f1f5f9;
-				margin: 0;
-				position: relative;
-				z-index: 1;
-			}
-			.page-header p {
-				color: #94a3b8;
-				font-size: 0.95rem;
-				margin: 0.5rem 0 0;
-				position: relative;
-				z-index: 1;
-			}
-			.page-header .accent-bar {
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				height: 4px;
-				background: linear-gradient(90deg, #0ea5e9, #38bdf8, #0ea5e9);
-			}
-
-			/* ===== Content wrapper ===== */
-			.content-wrapper {
-				max-width: 1040px;
-				margin: 0 auto;
-				padding: 2.5rem 1.5rem 3rem;
-			}
-
-			/* ===== Featured Post ===== */
-			.featured-post {
-				background: white;
-				border-radius: 20px;
-				overflow: hidden;
-				box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-				margin-bottom: 2.5rem;
-				transition: transform 0.3s ease, box-shadow 0.3s ease;
-			}
-			.featured-post:hover {
-				transform: translateY(-4px);
-				box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-			}
-			.featured-post a {
-				display: grid;
-				grid-template-columns: 1.2fr 1fr;
-				text-decoration: none;
-				min-height: 260px;
-			}
-			.featured-post img {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				border-radius: 0;
-				margin: 0;
-			}
-			.featured-body {
-				padding: 2rem 2.5rem;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-			}
-			.featured-label {
-				display: inline-block;
-				background: rgba(14, 165, 233, 0.1);
-				color: var(--accent);
-				font-size: 0.75rem;
-				font-weight: 600;
-				padding: 0.3em 0.8em;
-				border-radius: 6px;
-				margin-bottom: 0.8rem;
-				width: fit-content;
-				letter-spacing: 0.05em;
-			}
-			.featured-body .date {
-				font-size: 0.8rem;
-				color: rgb(var(--gray));
-				margin-bottom: 0.6rem;
-			}
-			.featured-body h2 {
-				font-size: 1.4rem;
-				font-weight: 700;
-				line-height: 1.5;
-				color: rgb(var(--gray-dark));
-				margin: 0 0 0.8rem;
-				transition: color 0.2s;
-			}
-			.featured-post a:hover h2 {
-				color: var(--accent);
-			}
-			.featured-body .description {
-				font-size: 0.9rem;
-				color: rgb(var(--gray));
-				line-height: 1.7;
-				margin: 0;
-				display: -webkit-box;
-				-webkit-line-clamp: 3;
-				-webkit-box-orient: vertical;
-				overflow: hidden;
-			}
-
-			/* ===== Posts Grid ===== */
-			.section-label {
-				font-size: 1.3rem;
-				font-weight: 700;
-				color: rgb(var(--gray-dark));
-				margin: 0 0 1.5rem;
-				padding-bottom: 0.8rem;
-				border-bottom: 2px solid rgb(var(--gray-light));
-			}
+			/* ===== Blog Grid ===== */
 			.posts-grid {
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(2, 1fr);
 				gap: 1.5rem;
 				list-style: none;
 				margin: 0;
 				padding: 0;
 			}
 			.post-card {
-				background: white;
-				border-radius: 16px;
+				background: var(--card-bg);
+				border-radius: var(--card-radius);
 				overflow: hidden;
-				box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+				box-shadow: var(--card-shadow);
 				transition: transform 0.3s ease, box-shadow 0.3s ease;
 			}
 			.post-card:hover {
 				transform: translateY(-4px);
-				box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+				box-shadow: var(--card-shadow-hover);
 			}
 			.post-card a {
 				text-decoration: none;
@@ -181,61 +49,32 @@ const remainingPosts = posts.slice(1);
 				margin: 0;
 			}
 			.post-card-body {
-				padding: 1rem 1.2rem 1.3rem;
+				padding: 1.2rem 1.5rem 1.5rem;
 			}
 			.post-card-body .date {
-				font-size: 0.75rem;
+				font-size: 0.8rem;
 				color: rgb(var(--gray));
-				margin-bottom: 0.4rem;
+				margin-bottom: 0.5rem;
 			}
 			.post-card-body h3 {
-				font-size: 0.95rem;
+				font-size: 1.05rem;
 				font-weight: 600;
 				line-height: 1.5;
 				color: rgb(var(--gray-dark));
 				margin: 0;
 				transition: color 0.2s;
-				display: -webkit-box;
-				-webkit-line-clamp: 3;
-				-webkit-box-orient: vertical;
-				overflow: hidden;
 			}
 			.post-card a:hover h3 {
 				color: var(--accent);
 			}
-
-			/* ===== Article Count ===== */
-			.article-count {
-				font-size: 0.85rem;
+			.posts-count {
+				text-align: center;
 				color: rgb(var(--gray));
-				margin-bottom: 1.5rem;
-			}
-			.article-count strong {
-				color: var(--accent);
+				font-size: 0.9rem;
+				margin-top: 2rem;
 			}
 
-			/* ===== Responsive ===== */
-			@media (max-width: 960px) {
-				.posts-grid {
-					grid-template-columns: repeat(2, 1fr);
-				}
-			}
-			@media (max-width: 768px) {
-				.page-header {
-					padding: 2rem 1.5rem 2rem;
-				}
-				.page-header h1 {
-					font-size: 1.5rem;
-				}
-				.featured-post a {
-					grid-template-columns: 1fr;
-				}
-				.featured-body {
-					padding: 1.5rem;
-				}
-				.featured-body h2 {
-					font-size: 1.15rem;
-				}
+			@media (max-width: 720px) {
 				.posts-grid {
 					grid-template-columns: 1fr;
 				}
@@ -245,60 +84,32 @@ const remainingPosts = posts.slice(1);
 	<body>
 		<Header />
 
-		<!-- Page Header -->
-		<section class="page-header">
-			<h1>📰 記事一覧</h1>
-			<p>AIの最新トレンドをわかりやすくお届け</p>
-			<div class="accent-bar"></div>
+		<!-- Mini Hero -->
+		<section class="mini-hero">
+			<h1>📰 すべての記事</h1>
+			<p>{posts.length}件の記事を公開中</p>
+			<div class="gradient-bar"></div>
 		</section>
 
-		<div class="content-wrapper">
-			<p class="article-count">全 <strong>{posts.length}</strong> 件の記事</p>
-
-			<!-- Featured Post -->
-			{featuredPost && (
-				<article class="featured-post">
-					<a href={`/blog/${featuredPost.id}/`}>
-						{featuredPost.data.heroImage && (
-							<Image width={720} height={378} src={featuredPost.data.heroImage} alt={featuredPost.data.title} />
-						)}
-						<div class="featured-body">
-							<span class="featured-label">🔥 最新記事</span>
-							<p class="date">
-								<FormattedDate date={featuredPost.data.pubDate} />
-							</p>
-							<h2>{featuredPost.data.title}</h2>
-							{featuredPost.data.description && (
-								<p class="description">{featuredPost.data.description}</p>
+		<!-- Posts Grid -->
+		<div class="content-container">
+			<ul class="posts-grid">
+				{posts.map((post) => (
+					<li class="post-card">
+						<a href={`/blog/${post.id}/`}>
+							{post.data.heroImage && (
+								<Image width={600} height={315} src={post.data.heroImage} alt={post.data.title} />
 							)}
-						</div>
-					</a>
-				</article>
-			)}
-
-			<!-- Remaining Posts -->
-			{remainingPosts.length > 0 && (
-				<>
-					<h2 class="section-label">すべての記事</h2>
-					<ul class="posts-grid">
-						{remainingPosts.map((post) => (
-							<li class="post-card">
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={400} height={210} src={post.data.heroImage} alt={post.data.title} />
-									)}
-									<div class="post-card-body">
-										<p class="date">
-											<FormattedDate date={post.data.pubDate} />
-										</p>
-										<h3>{post.data.title}</h3>
-									</div>
-								</a>
-							</li>
-						))}
-					</ul>
-				</>
-			)}
+							<div class="post-card-body">
+								<p class="date">
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+								<h3>{post.data.title}</h3>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
 		</div>
 
 		<Footer />
