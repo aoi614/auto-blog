@@ -2,6 +2,7 @@
 title: "衝撃スクープ！Anthropicの次世代AI「Claude Mythos」内部文書流出の裏側"
 description: "Anthropicの未発表AIモデル「Claude Mythos」の内部文書が流出し、AIコミュニティに激震。次世代AIがもたらす革新と、その影響について深掘りします。"
 pubDate: 'Mar 29, 2026'
+heroImage: "../../assets/og/anthropic-ai-claude-mythos-5376.png"
 ---
 
 皆さん、AI業界のホットなニュースには常にアンテナを張っていることと思います。いやー、今回はとんでもないスクープが飛び込んできましたね！ 
