@@ -17,7 +17,7 @@
 		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
 		0 16px 32px rgba(var(--gray), 33%);
 
-	/* Dark palette */
+	/* Dark palette (Used for header/footer) */
 	--dark-bg: #0c1222;
 	--dark-bg-mid: #0f172a;
 	--dark-bg-light: #1e293b;
@@ -25,11 +25,25 @@
 	--dark-text-muted: #94a3b8;
 	--dark-border: rgba(255, 255, 255, 0.08);
 
-	/* Card */
+	/* Card & Body */
+	--body-bg: #f8fafc;
 	--card-bg: #ffffff;
 	--card-radius: 16px;
 	--card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 	--card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Dark Theme Variables ===== */
+[data-theme='dark'] {
+	/* Swap gray for dark mode texts */
+	--gray-dark: 241, 245, 249; /* f1f5f9 */
+	--gray: 148, 163, 184; /* 94a3b8 */
+	--gray-light: 51, 65, 85;  /* 334155 */
+	
+	--body-bg: #0c1222;
+	--card-bg: #1e293b;
+	--card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+	--card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.6);
 }
 
 /* ===== Fonts ===== */
@@ -54,10 +68,11 @@ body {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: #f8fafc;
+	background: var(--body-bg);
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
+	transition: background 0.3s ease, color 0.3s ease;
 	font-size: 20px;
 	line-height: 1.7;
 }

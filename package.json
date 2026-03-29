@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
     "generate-og": "node scripts/generate-og-image.mjs"
@@ -19,6 +19,7 @@
     "@google/generative-ai": "^0.24.1",
     "astro": "^6.0.8",
     "dotenv": "^17.3.1",
+    "pagefind": "^1.4.0",
     "rss-parser": "^3.13.0",
     "satori": "^0.26.0",
     "sharp": "^0.34.3"

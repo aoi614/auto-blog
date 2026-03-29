@@ -1,6 +1,8 @@
 ---
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+import SearchButton from './SearchButton.astro';
+import ThemeToggle from './ThemeToggle.astro';
 ---
 
 <header id="site-header">
@@ -16,6 +18,8 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/about">サイトについて</HeaderLink>
 		</div>
 		<div class="nav-actions">
+			<SearchButton />
+			<ThemeToggle />
 			<a href="/rss.xml" target="_blank" aria-label="RSSフィード" class="rss-link">
 				<svg viewBox="0 0 16 16" aria-hidden="true" width="20" height="20"
 					><path

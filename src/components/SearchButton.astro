@@ -1,0 +1,194 @@
+---
+// SearchButton.astro
+---
+
+<div class="search-container">
+	<button id="search-trigger" aria-label="サイト内検索" class="search-btn">
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<circle cx="11" cy="11" r="8"></circle>
+			<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+		</svg>
+		<span class="search-text">検索</span>
+	</button>
+</div>
+
+<dialog id="search-dialog" class="search-dialog">
+	<div class="search-dialog-inner">
+		<div class="search-header">
+			<h3>🔍 サイト内検索</h3>
+			<button id="search-close" aria-label="閉じる" class="close-btn">
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="18" y1="6" x2="6" y2="18"></line>
+					<line x1="6" y1="6" x2="18" y2="18"></line>
+				</svg>
+			</button>
+		</div>
+		<div id="search-ui"></div>
+	</div>
+</dialog>
+
+<style>
+	.search-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		background: rgba(var(--gray-light), 0.3);
+		border: 1px solid rgba(var(--gray-light), 0.5);
+		border-radius: 8px;
+		padding: 0.4em 0.8em;
+		color: rgb(var(--gray-dark));
+		font-size: 0.9rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.search-btn:hover {
+		background: rgba(var(--gray-light), 0.8);
+		color: var(--accent);
+	}
+	
+	.search-dialog {
+		padding: 0;
+		border: none;
+		border-radius: 12px;
+		box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+		max-width: 640px;
+		width: 90vw;
+		margin: auto;
+		background: var(--card-bg, #fff);
+	}
+	.search-dialog::backdrop {
+		background: rgba(0,0,0,0.5);
+		backdrop-filter: blur(4px);
+	}
+	.search-dialog-inner {
+		padding: 1.5rem;
+		max-height: 80vh;
+		overflow-y: auto;
+	}
+	.search-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.5rem;
+	}
+	.search-header h3 {
+		margin: 0;
+		font-size: 1.2rem;
+		color: var(--dark-text, #111827);
+	}
+	.close-btn {
+		background: transparent;
+		border: none;
+		color: rgb(var(--gray));
+		cursor: pointer;
+		padding: 0.5rem;
+		border-radius: 8px;
+		transition: background 0.2s;
+	}
+	.close-btn:hover {
+		background: rgba(var(--gray-light), 0.5);
+		color: var(--dark-text);
+	}
+
+	/* CSS specifically injected for pagefind to blend in */
+	:global(.pagefind-ui__search-input) {
+		font-family: inherit !important;
+		border-radius: 8px !important;
+	}
+	:global(.pagefind-ui__result-title) {
+		color: var(--accent, #0ea5e9) !important;
+	}
+	
+	@media (max-width: 720px) {
+		.search-text {
+			display: none;
+		}
+		.search-btn {
+			padding: 0.5em;
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const trigger = document.getElementById('search-trigger');
+		const close = document.getElementById('search-close');
+		const dialog = document.getElementById('search-dialog') as HTMLDialogElement;
+		
+		let loaded = false;
+
+		const initPagefind = async () => {
+			if (loaded) return;
+			try {
+				// Inject the CSS
+				const link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = '/pagefind/pagefind-ui.css';
+				document.head.appendChild(link);
+				
+				// Dynamically load the JS
+				const script = document.createElement('script');
+				script.src = '/pagefind/pagefind-ui.js';
+				script.onload = () => {
+					// @ts-ignore
+					if (window.PagefindUI) {
+						// @ts-ignore
+						new window.PagefindUI({ 
+							element: "#search-ui",
+							showImages: true,
+							translations: {
+								placeholder: "キーワードで記事を検索...",
+								clear_search: "クリア",
+								search_label: "サイト内検索",
+								zero_results: "[SEARCH_TERM] に一致する記事は見つかりませんでした。",
+								many_results: "[SEARCH_TERM] で [COUNT] 件の記事が見つかりました。",
+								one_result: "[SEARCH_TERM] で 1 件の記事が見つかりました。"
+							}
+						});
+						// Focus input after loading
+						setTimeout(() => {
+							const input = document.querySelector('.pagefind-ui__search-input') as HTMLInputElement;
+							if(input) input.focus();
+						}, 100);
+					}
+				};
+				document.head.appendChild(script);
+				loaded = true;
+			} catch (e) {
+				console.error('Pagefind failed to load. Are you in dev mode?', e);
+				document.getElementById('search-ui')!.innerHTML = '<p style="color:red; text-align:center;">開発環境では検索機能は動作しません（ビルド後に動作します）。</p>';
+			}
+		};
+
+		if (trigger && dialog && close) {
+			trigger.addEventListener('click', () => {
+				dialog.showModal();
+				initPagefind().catch(e => {
+					document.getElementById('search-ui')!.innerHTML = '<p style="color:red; text-align:center;">検索エンジンのロードに失敗しました。ビルドされていない開発環境の可能性があります。</p>';
+				});
+				
+				// Focus if already loaded
+				if(loaded) {
+					setTimeout(() => {
+						const input = document.querySelector('.pagefind-ui__search-input') as HTMLInputElement;
+						if(input) input.focus();
+					}, 50);
+				}
+			});
+
+			close.addEventListener('click', () => {
+				dialog.close();
+			});
+
+			// Close on clicking backdrop
+			dialog.addEventListener('click', (e) => {
+				const rect = dialog.getBoundingClientRect();
+				const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height
+					&& rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+				if (!isInDialog) {
+					dialog.close();
+				}
+			});
+		}
+	});
+</script>

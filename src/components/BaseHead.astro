@@ -139,3 +139,16 @@ const breadcrumbData = breadcrumbs ? {
 
 <!-- Google AdSense -->
 <script is:inline async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8204767432830277" crossorigin="anonymous"></script>
+
+<!-- Initialize Theme -->
+<script is:inline>
+	const getThemePreference = () => {
+		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+			return localStorage.getItem('theme');
+		}
+		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+	};
+	const isDark = getThemePreference() === 'dark';
+	document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+	document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+</script>
